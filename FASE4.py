@@ -80,3 +80,13 @@ def ejecutar_caso(log, numero, nombre, operacion, error_esperado):
     return correcto
 
 
+def simular(log):
+    """Ejecuta registros, reservas, cancelaciones y controles de integridad."""
+    sistema = Sistema()
+
+    def verificar_reserva(codigo, estado, esperado):
+        reserva = sistema.obtener_reserva(codigo)
+        if reserva.estado is not estado or reserva.total != Decimal(esperado):
+            raise AssertionError("El estado o el costo no coincide con lo esperado.")
+        return reserva.describir()
+
