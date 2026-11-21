@@ -137,3 +137,14 @@ def main():
         print(f"No se pudo abrir el log: {error}. El registro saldrá por consola.")
         manejador = logging.StreamHandler()
     manejador.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
+    log.addHandler(manejador)
+    try:
+        log.info("Inicio de la simulación de Software FJ")
+        return simular(log)
+    finally:
+        log.removeHandler(manejador)
+        manejador.close()
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
