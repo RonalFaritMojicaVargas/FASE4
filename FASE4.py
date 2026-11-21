@@ -39,3 +39,12 @@ class Sistema:
     def registrar_servicio(self, tipo, *args, **kwargs):
         return self._agregar(self.__servicios, tipo(*args, **kwargs))
 
+    def reservar(self, codigo, cliente, servicio, horas, unidades=1, **ajustes):
+        cliente = self._buscar(self.__clientes, cliente)
+        servicio = self._buscar(self.__servicios, servicio)
+        reserva = Reserva(codigo, cliente, servicio, horas, unidades)
+        reserva.procesar(**ajustes)
+        reserva.confirmar(self.__reservas)
+        # Una solicitud fallida nunca ingresa en la lista de reservas.
+        return self._agregar(self.__reservas, reserva)
+
