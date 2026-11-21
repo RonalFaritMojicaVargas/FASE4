@@ -57,3 +57,26 @@ class Sistema:
         return self._buscar(self.__reservas, codigo)
 
 
+def ejecutar_caso(log, numero, nombre, operacion, error_esperado):
+    """Verifica cada resultado y registra el final aun si ocurre una excepción."""
+    etiqueta = f"{numero:02d} {nombre}"
+    correcto = False
+    try:
+        resultado = operacion()
+    except ErrorSoftwareFJ as error:
+        correcto = type(error) is error_esperado
+        mensaje = f"{'Rechazo esperado' if correcto else 'Error inesperado'}: {error}"
+        log.exception("%s | %s", etiqueta, mensaje)
+    except Exception as error:
+        mensaje = f"Fallo inesperado ({type(error).__name__}): {error}"
+        log.exception("%s | %s", etiqueta, mensaje)
+    else:
+        correcto = error_esperado is None
+        mensaje = resultado if correcto else "Se esperaba un error y la operación continuó."
+        log.log(logging.INFO if correcto else logging.ERROR, "%s | %s", etiqueta, mensaje)
+    finally:
+        log.info("%s | Fin de la operación", etiqueta)
+    print(f"{etiqueta} | {'OK' if correcto else 'FALLO'} | {mensaje}")
+    return correcto
+
+
