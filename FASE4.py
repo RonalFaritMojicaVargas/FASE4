@@ -127,3 +127,13 @@ def simular(log):
     return 0 if aprobados == len(casos) else 1
 
 
+def main():
+    ruta = Path(__file__).with_name("software_fj.log")
+    log = logging.getLogger("software_fj")
+    log.setLevel(logging.INFO)
+    try:
+        manejador = logging.FileHandler(ruta, encoding="utf-8")
+    except OSError as error:
+        print(f"No se pudo abrir el log: {error}. El registro saldrá por consola.")
+        manejador = logging.StreamHandler()
+    manejador.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
