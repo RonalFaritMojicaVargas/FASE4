@@ -18,3 +18,13 @@ class Sistema:
         self.__servicios = []
         self.__reservas = []
 
+    @staticmethod
+    def _buscar(lista, codigo):
+        codigo = texto(codigo, "Código").upper()
+        for objeto in lista:
+            if objeto.codigo == codigo:
+                return objeto
+        raise OperacionInvalida(f"No existe un registro con el código {codigo}.")
+
+    @staticmethod
+    def _agregar(lista, objeto):
