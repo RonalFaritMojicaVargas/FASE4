@@ -48,3 +48,12 @@ class Sistema:
         # Una solicitud fallida nunca ingresa en la lista de reservas.
         return self._agregar(self.__reservas, reserva)
 
+    def cancelar(self, codigo):
+        reserva = self._buscar(self.__reservas, codigo)
+        reserva.cancelar()
+        return reserva.describir()
+
+    def obtener_reserva(self, codigo):
+        return self._buscar(self.__reservas, codigo)
+
+
