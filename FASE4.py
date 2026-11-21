@@ -90,3 +90,40 @@ def simular(log):
             raise AssertionError("El estado o el costo no coincide con lo esperado.")
         return reserva.describir()
 
+    casos = [
+        ("Cliente válido", lambda: sistema.registrar_cliente("C1", "Ana Pérez", "ana@example.com"), None),
+        ("Correo inválido", lambda: sistema.registrar_cliente("C2", "Luis", "sin-arroba"), DatoInvalido),
+        ("Nombre faltante", lambda: sistema.registrar_cliente("C3", "", "luis@example.com"), DatoInvalido),
+        ("Cliente duplicado", lambda: sistema.registrar_cliente("c1", "Luis", "luis@example.com"), OperacionInvalida),
+        ("Crear sala", lambda: sistema.registrar_servicio(ReservaSala, "S1", "Reuniones", 50000, 10), None),
+        ("Crear equipos", lambda: sistema.registrar_servicio(AlquilerEquipo, "S2", "Portátiles", 10000, 4), None),
+        ("Crear asesoría", lambda: sistema.registrar_servicio(Asesoria, "S3", "Python", 60000, 15000), None),
+        ("Tarifa inválida", lambda: sistema.registrar_servicio(ReservaSala, "X", "Sala", "abc", 4), DatoInvalido),
+        ("Registrar sala desactivada", lambda: sistema.registrar_servicio(ReservaSala, "S4", "Auditorio", 90000, 20, False), None),
+        ("Reservar sala", lambda: sistema.reservar("R1", "C1", "S1", 2, 5), None),
+        ("Verificar precio base", lambda: verificar_reserva("R1", Estado.CONFIRMADA, "100000"), None),
+        ("Sala ocupada", lambda: sistema.reservar("R2", "C1", "S1", 1), ServicioNoDisponible),
+        ("Sin registro de la reserva fallida", lambda: sistema.obtener_reserva("R2"), OperacionInvalida),
+        ("Reservar equipos con descuento e impuesto", lambda: sistema.reservar("R3", "C1", "S2", 2, 3, descuento=10, impuesto=19), None),
+        ("Verificar costo de equipos", lambda: verificar_reserva("R3", Estado.CONFIRMADA, "64260"), None),
+        ("Duración inválida", lambda: sistema.reservar("R4", "C1", "S3", 0), DatoInvalido),
+        ("Servicio desactivado", lambda: sistema.reservar("R5", "C1", "S4", 1), ServicioNoDisponible),
+        ("Cuota de descuento inválida", lambda: sistema.reservar("R6", "C1", "S3", 1, descuento=110), DatoInvalido),
+        ("Reservar asesoría con impuesto", lambda: sistema.reservar("R7", "C1", "S3", 1, impuesto=19), None),
+        ("Verificar costo de asesoría", lambda: verificar_reserva("R7", Estado.CONFIRMADA, "89250"), None),
+        ("Cancelar reserva de sala", lambda: sistema.cancelar("R1"), None),
+        ("Verificar cancelación", lambda: verificar_reserva("R1", Estado.CANCELADA, "100000"), None),
+        ("Cancelar de nuevo", lambda: sistema.cancelar("R1"), OperacionInvalida),
+        ("Aforo superado", lambda: sistema.reservar("R8", "C1", "S1", 1, 11), DatoInvalido),
+        ("Reservar sala liberada con descuento", lambda: sistema.reservar("R9", "C1", "S1", 1, descuento=10), None),
+        ("Verificar descuento", lambda: verificar_reserva("R9", Estado.CONFIRMADA, "45000"), None),
+    ]
+    aprobados = 0
+    for numero, (nombre, operacion, error) in enumerate(casos, start=1):
+        aprobados += ejecutar_caso(log, numero, nombre, operacion, error)
+    resumen = f"{aprobados}/{len(casos)} casos con el resultado esperado."
+    log.info(resumen)
+    print(resumen)
+    return 0 if aprobados == len(casos) else 1
+
+
