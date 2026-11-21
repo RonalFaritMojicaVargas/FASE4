@@ -28,3 +28,14 @@ class Sistema:
 
     @staticmethod
     def _agregar(lista, objeto):
+        if any(actual.codigo == objeto.codigo for actual in lista):
+            raise OperacionInvalida(f"El código {objeto.codigo} ya existe.")
+        lista.append(objeto)
+        return objeto.describir()
+
+    def registrar_cliente(self, codigo, nombre, correo):
+        return self._agregar(self.__clientes, Cliente(codigo, nombre, correo))
+
+    def registrar_servicio(self, tipo, *args, **kwargs):
+        return self._agregar(self.__servicios, tipo(*args, **kwargs))
+
